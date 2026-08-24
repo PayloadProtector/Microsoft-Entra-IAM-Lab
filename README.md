@@ -65,6 +65,11 @@ Example rules:
 
 Microsoft Entra ID reevaluates membership when the underlying user attribute changes.
 
+### Evidence – Dynamic Finance Group
+The Finance security group is configured with **Dynamic** membership, allowing membership to follow identity attributes rather than manual assignments.
+
+![GRP-Finance-Users dynamic security group](screenshots/GRP%20Finance%20%202026-08-23%204.35.01%20PM.png)
+
 ### Lab Finding
 The IT group initially contained more users than expected because older lab accounts already had `Department = IT`. This demonstrated that dynamic membership is attribute-driven and highlighted the importance of identity-data quality.
 
@@ -85,6 +90,11 @@ WHERE: RG-Contoso-Finance
 
 This allows Finance users to view resources without giving them permission to modify resources or delegate access.
 
+### Evidence – Group-Based Reader Assignment
+The screenshot below shows `GRP-Finance-Users` selected as the member for the Azure **Reader** role assignment.
+
+![Finance group selected for Azure Reader RBAC](screenshots/create%20and%20review%20RBAC%202026-08-23%204.30.13%20PM.png)
+
 ## Phase 4 – Mover Lifecycle Test
 An employee transfer was simulated by changing Chris Green's department from Finance to IT.
 
@@ -98,6 +108,11 @@ Department = Finance
 GRP-Finance-Users
 ```
 
+### Evidence – Before Transfer
+Before the mover event, Chris Green and John Miller were members of the Finance group.
+
+![Finance members before mover](screenshots/GRP%20members%202026-08-23%204.43.45%20PM.png)
+
 After the attribute change:
 
 ```text
@@ -108,6 +123,15 @@ Department = IT
       |
       +--> Automatically added to GRP-IT-Users
 ```
+
+### Evidence – After Transfer
+After Chris Green's department was changed to IT, he appeared in the IT dynamic group:
+
+![IT members after mover](screenshots/mover%20%202026-08-24%2012.49.22%20AM.png)
+
+The Finance group then showed only John Miller, validating that Chris was automatically removed from Finance membership:
+
+![Finance members after mover](screenshots/Finance%20mover%202026-08-24%2012.51.07%20AM.png)
 
 No group membership was manually changed. Because Finance authorization was group-based, the user's Finance access followed the membership change.
 
@@ -121,6 +145,16 @@ The workflow included:
 3. Removed the directly assigned privileged role.
 4. Cleared the IT department attribute.
 5. Verified automatic removal from `GRP-IT-Users` through dynamic membership reevaluation.
+
+### Evidence – Account Disabled
+The offboarded lab account shows **Account status: Disabled**, demonstrating the authentication-blocking step of the leaver workflow.
+
+![Offboarded user account disabled](screenshots/Sergeant%20%20account%20status%20%202026-08-24%201.00.29%20AM.png)
+
+### Evidence – Direct Privilege Removed
+After privilege cleanup, the user's **Active assignments** view returned **No results**.
+
+![Offboarded user has no active assigned roles](screenshots/sergeant%20role%20assignment%20%202026-08-24%201.09.59%20AM.png)
 
 This demonstrated the difference between blocking authentication and cleaning up authorization.
 
